@@ -165,8 +165,8 @@ while running:
             for number in range(len(color_list)):
                 if current_color == color_list[number]:
                     if mouse_x % pixels_side_length != 0 and mouse_y % pixels_side_length != 0:
-                        grid_mouse_x = mouse_x // 32 + 1
-                        grid_mouse_y = mouse_y // 32 + 1
+                        grid_mouse_x = mouse_x // pixels_side_length
+                        grid_mouse_y = mouse_y // pixels_side_length
                         grid[grid_mouse_y][grid_mouse_x] = current_color
                     else:
                         user_out_of_bounds = True
