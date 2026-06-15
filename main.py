@@ -160,7 +160,7 @@ while running:
             cyan.selected
             current_color = cyan.color
         #grid
-        if mouse_x > 0 and mouse_x > 640 and mouse_y > 0 and mouse_y < 640:
+        if 0 <= mouse_x < 640 and 0 <= mouse_y < 640:
             color_list = [red.color, black.color, white.color, green.color, blue.color, yellow.color, magenta.color, cyan.color]
             for number in range(len(color_list)):
                 if current_color == color_list[number]:
@@ -174,6 +174,13 @@ while running:
         #pencil
 
         #eraser
+        
+        # coloring the grid after changes
+        for row in range(side_length_of_grids):
+            for col in range(side_length_of_grids):
+                pygame.draw.rect(window, grid[row][col], col * pixels_side_length, row * pixels_side_length, pixels_side_length,pixels_side_length, 0)
+
+
 
 
 
