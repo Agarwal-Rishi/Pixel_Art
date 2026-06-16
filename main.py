@@ -50,7 +50,7 @@ text_entry = pygame_gui.elements.UITextEntryLine(
     relative_rect=pygame.Rect(100, 200, 200, 40),
     manager=manager,
 )
-
+grid_formalized = False
 running = True
 while running:
     time_delta = clock.tick(60) / 1000.0
@@ -104,6 +104,7 @@ while running:
         #  and side_length_of_grids is how many GRIDS length AND width
         iteration = 0
         for x in range(0, stopping_point_for_iteration, pixels_side_length):
+            #print("x")
             pygame.draw.line(
                 window, 
                 color=(0,0,0), 
@@ -115,6 +116,7 @@ while running:
 
         iteration = 0
         for y in range(0, stopping_point_for_iteration, pixels_side_length):
+           # print("y")
             pygame.draw.line(
                 window, 
                 color=(0,0,0),
@@ -123,16 +125,16 @@ while running:
                 width=1
             )
             iteration += 1
-        
-        grid = []
-        for row in range(side_length_of_grids):
-            grid_row = []
-            for col in range(side_length_of_grids):
-                grid_row.append(white.color)
-            grid.append(grid_row)
-        grid_drawn = True
+        if not grid_formalized:
+            grid = []
+            for row in range(side_length_of_grids):
+                grid_row = []
+                for col in range(side_length_of_grids):
+                    grid_row.append(white.color)
+                grid.append(grid_row)
+            grid_formalized = True
     # mouse clicking und button management
-        print("here")
+
         #button clicking
         # color menu
         if red.rect.collidepoint(mouse_x,mouse_y):
@@ -170,7 +172,7 @@ while running:
                         grid[grid_mouse_y][grid_mouse_x] = current_color
                     else:
                         user_out_of_bounds = True
-            print(grid)
+            #print(grid)
         #pencil
 
         #eraser
@@ -178,7 +180,7 @@ while running:
         # coloring the grid after changes
         for row in range(side_length_of_grids):
             for col in range(side_length_of_grids):
-                pygame.draw.rect(window, grid[row][col], col * pixels_side_length, row * pixels_side_length, pixels_side_length,pixels_side_length, 0)
+                pygame.draw.rect(window, grid[row][col], (col * pixels_side_length, row * pixels_side_length, pixels_side_length,pixels_side_length))
 
 
 
