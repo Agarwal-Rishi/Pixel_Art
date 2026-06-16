@@ -15,7 +15,7 @@ class Button():
     def draw(self, window):
         pygame.draw.rect(window, self.color, self.rect)
         if self.selected:
-            pygame.draw.rect(suface, (0, 0, 0), 3)
+            pygame.draw.rect(window, (0, 0, 0), 3)
 
 
 pygame.init()
@@ -55,11 +55,14 @@ running = True
 while running:
     time_delta = clock.tick(60) / 1000.0
 
+    # linked lists, undo button
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = event.pos
+            if event.type == pygame.MOUSEMOTION:
+                mouse_x, mouse_y = event.pos
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN and start:
             user_entry_text = text_entry.get_text()
             side_length_of_grids = int(user_entry_text)
@@ -70,7 +73,7 @@ while running:
 
         manager.process_events(event)
     
-    pygame.display.update()
+    
 
     window.fill((255, 255, 255))
 
@@ -180,10 +183,10 @@ while running:
         # coloring the grid after changes
         for row in range(side_length_of_grids):
             for col in range(side_length_of_grids):
-                pygame.draw.rect(window, grid[row][col], (col * pixels_side_length, row * pixels_side_length, pixels_side_length,pixels_side_length))
+                pygame.draw.rect(window, grid[row][col], (col * pixels_side_length + 1, row * pixels_side_length + 1, pixels_side_length - 2,pixels_side_length - 2))
+   
 
-
-
+        
 
 
 
@@ -198,3 +201,9 @@ while running:
     pygame.display.flip()
 
 pygame.quit("here")
+
+# PROBLEM. WHEN WE ARE DRAWING OUR WHITE RECTS AND RECTS,
+#  WE ARE DRAWING ONTO OUR BLACK GRID LINES.
+#  THE FIX WOULD BE FIXING THE SIZE AND HOW BIG THE RECTS DRAW.
+#  THIS WILL COVER ALL THE SQUARE EXCEPT FOR THE OUTERLAYER,
+#  MAKING THE GRID LINES VISIBLE
