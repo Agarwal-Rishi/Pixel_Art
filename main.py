@@ -20,6 +20,7 @@ class node():
     def __init__(self, data=None):
         self.data = data
         self.next = None
+        self.previous = None
 
 class linked_list():
     def __init__(self):
@@ -51,6 +52,14 @@ class linked_list():
         while cur.next != None:
             print(cur.next.data)
             cur = cur.next
+    
+    def how_many(self):
+        cur = self.head
+        elements = 1
+        while cur.next != None:
+            cur = cur.next
+            elements += 1
+        return elements
 
 
 pygame.init()
@@ -73,6 +82,9 @@ clock = pygame.time.Clock()
 undo_button = pygame.image.load("Undo_Button.png").convert_alpha()
 undo_button = pygame.transform.scale(undo_button, (56,56))
 
+redo_button = pygame.image.load("Redo_Button.png").convert_alpha()
+redo_button = pygame.transform.scale(redo_button, (56,56))
+
 side_length_of_grids = None
 start = True
 
@@ -91,6 +103,8 @@ text_entry = pygame_gui.elements.UITextEntryLine(
     manager=manager,
 )
 grid_formalized = False
+bool_for_undo_button = False
+bool_for_redo_button = False
 running = True
 while running:
     time_delta = clock.tick(60) / 1000.0
@@ -100,8 +114,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            bool_for_redo_button = True
+            bool_for_undo_button = True
             mouse_x, mouse_y = event.pos
         elif pygame.mouse.get_pressed()[0] and event.type == pygame.MOUSEMOTION:
+            bool_for_redo_button = True
+            bool_for_undo_button = True
             mouse_x, mouse_y = event.pos
         elif event.type == pygame.MOUSEBUTTONUP:
             draw = False
@@ -134,6 +152,7 @@ while running:
         cyan.draw(window) 
         window.blit(undo_button, (692,48))
         undo_button_rect = undo_button.get_rect(x=692, y=48)
+        window.blit(redo_button, (768, 48))
         pixels_side_length = 640 // side_length_of_grids
         stopping_point_for_iteration = pixels_side_length * side_length_of_grids
         # pixels_side_length is how many pixels per grid length AND width,
@@ -179,7 +198,7 @@ while running:
                         grid_mouse_y = mouse_y // pixels_side_length
                         #iterating for undo button
                         if not has_run:
-                            linked_list.append((grid_mouse_x, grid_mouse_y, grid[grid_mouse_y][grid_mouse_x]))
+                            linked_list.append((grid_mouse_x, grid_mouse_y, grid[grid_mouse_y][grid_mouse_x], current_color))
                             #linked_list.display()
                             has_run = True
 
@@ -211,15 +230,18 @@ while running:
         elif cyan.rect.collidepoint(mouse_x,mouse_y):
             cyan.selected
             current_color = cyan.color
-        elif undo_button_rect.collidepoint(mouse_x, mouse_y):
-            print("running")
-            last_element = linked_list.get_last_element()
-            previous_x, previous_y, r_g_b = last_element.data
-            print(previous_x)
-            print(previous_y)
-            print(r_g_b)
-            grid[grid_mouse_y][grid_mouse_x] = r_g_b
-            linked_list.delete()
+        # undo button
+        if bool_for_undo_button:
+                print("running")
+                last_element = linked_list.get_last_element()
+                if last_element.data is not None:
+                    previous_x, previous_y, r_g_b_before, r_g_b_after = last_element.data
+                    print(previous_x)
+                    print(previous_y)
+                    print(r_g_b_before)
+                    grid[previous_y][previous_x] = r_g_b_before
+        #redo button
+        
 
         # coloring the grid after changes
         for row in range(side_length_of_grids):
