@@ -2,6 +2,7 @@ class node():
     def __init__(self, data=None):
         self.data = data
         self.next = None
+        self.previous = None
 
 class linked_list():
     def __init__(self):
@@ -9,22 +10,18 @@ class linked_list():
 
     def append(self, data):
         new_node = node(data)
-        cur = self.head
-        while cur.next != None:
-            cur = cur.next
-        cur.next = new_node
+        new_node.next = self.head
+        self.head = new_node
+
 
     def delete(self):
-        cur = self.head
-        while cur.next != None:
-            cur = cur.next
-        cur.next = cur
+        self.head.next = self.head
+        #while cur.next != None:
+        #    cur = cur.next
+        #cur.next = cur
 
-    def get_last_element(self):
-        cur = self.head       
-        while cur.next != None:
-            cur = cur.next
-        return cur
+    def get_first_element(self):
+        return self.head
             
         
 
@@ -47,12 +44,14 @@ class linked_list():
             
 
 my_list = linked_list()
-my_list.append(2)
-my_list.append(3)
 my_list.append(4)
+my_list.append(7)
 my_list.display()
-if my_list.contains(3):
-    print("6")
+my_list.delete()
+my_list.display()
+
+####append works 
+
 
 
 

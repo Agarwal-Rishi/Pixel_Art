@@ -20,37 +20,42 @@ class node():
     def __init__(self, data=None):
         self.data = data
         self.next = None
+        self.previous = None
 
 class linked_list():
     def __init__(self):
         self.head = node()
-    
+
     def append(self, data):
         new_node = node(data)
-        cur = self.head
-        while cur.next != None:
-            cur = cur.next
-        cur.next = new_node
+        self.head.previous = new_node
+        new_node.next = self.head
+        self.head = new_node
+
 
     def delete(self):
-        cur = self.head
-        while cur.next != None:
-            previous = cur
-            cur = cur.next
-        previous.next = None
+        self.head.next = self.head
+        #while cur.next != None:
+        #    cur = cur.next
+        #cur.next = cur
 
-    def get_last_element(self):
-        cur = self.head       
-        while cur.next != None:
+    def get_required_element(self, num_of_elements):
+        cur = self.head
+        while num_of_elements != 0:
             cur = cur.next
+            num_of_elements -= 1
         return cur
-    
+            
+        
+
     def display(self):
         cur = self.head
         print(cur.data)
         while cur.next != None:
             print(cur.next.data)
             cur = cur.next
+            
+         
 
 
 pygame.init()
@@ -92,8 +97,20 @@ text_entry = pygame_gui.elements.UITextEntryLine(
     relative_rect=pygame.Rect(100, 200, 200, 40),
     manager=manager,
 )
+
 grid_formalized = False
+
 running = True
+
+action_list = []
+# 0's and 1's will be added to this list
+# 0's are undo's
+# 1's are redo's
+
+
+
+
+
 while running:
     time_delta = clock.tick(60) / 1000.0
 
@@ -216,14 +233,23 @@ while running:
             cyan.selected
             current_color = cyan.color
         if bool_for_undo_button and undo_button_rect.collidepoint(mouse_x, mouse_y):
-            last_element = linked_list.get_last_element()
-            if last_element.data is not None:
-                previous_x, previous_y, r_g_b = last_element.data
+            action_list.append(0)
+            num_of_zeros = 0
+            for number in range(len(action_list), -1):
+                if number == 0:
+                    num_of_zeros += 1
+                else:
+                    break
+
+            required_element = linked_list.get_required_element(num_of_zeros)
+            if required_element.data is not None:
+                previous_x, previous_y, r_g_b = required_element.data
                 print(previous_x)
                 print(previous_y)
                 print(r_g_b)
                 grid[previous_y][previous_x] = r_g_b
                 linked_list.delete()
+                
 
         # coloring the grid after changes
         for row in range(side_length_of_grids):
