@@ -1,3 +1,4 @@
+from types import NoneType
 import pygame
 import pygame_gui
 
@@ -34,10 +35,7 @@ class linked_list():
 
 
     def delete(self):
-        self.head.next = self.head
-        #while cur.next != None:
-        #    cur = cur.next
-        #cur.next = cur
+        self.head.next.previous = None
 
     def get_required_element(self, num_of_elements):
         cur = self.head
@@ -87,9 +85,10 @@ pencil = True
 eraser = False
 current_color = white.color
 
-bool_for_undo_button = False
+mouse_clicked = False
 
 linked_list = linked_list()
+current = linked_list.head
 
 user_out_of_bounds = False
 
@@ -99,6 +98,7 @@ text_entry = pygame_gui.elements.UITextEntryLine(
 )
 
 grid_formalized = False
+first_node_check = True
 
 running = True
 
@@ -113,6 +113,7 @@ action_list = []
 
 while running:
     time_delta = clock.tick(60) / 1000.0
+    mouse_clicked = False
 
     draw = False
     for event in pygame.event.get():
@@ -120,9 +121,9 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = event.pos
-            bool_for_undo_button = True
+            mouse_clicked = True
         elif pygame.mouse.get_pressed()[0] and event.type == pygame.MOUSEMOTION:
-            bool_for_undo_button = True
+            mouse_clicked = True
             mouse_x, mouse_y = event.pos
         elif event.type == pygame.MOUSEBUTTONUP:
             draw = False
@@ -201,7 +202,7 @@ while running:
                         #iterating for undo button
                         if not has_run:
                             linked_list.append((grid_mouse_x, grid_mouse_y, grid[grid_mouse_y][grid_mouse_x]))
-                            #linked_list.display()
+                            current = linked_list.head
                             has_run = True
 
                         grid[grid_mouse_y][grid_mouse_x] = current_color
@@ -232,23 +233,25 @@ while running:
         elif cyan.rect.collidepoint(mouse_x,mouse_y):
             cyan.selected
             current_color = cyan.color
-        if bool_for_undo_button and undo_button_rect.collidepoint(mouse_x, mouse_y):
-            action_list.append(0)
-            num_of_zeros = 0
-            for number in range(len(action_list), -1):
-                if number == 0:
-                    num_of_zeros += 1
-                else:
-                    break
 
-            required_element = linked_list.get_required_element(num_of_zeros)
-            if required_element.data is not None:
-                previous_x, previous_y, r_g_b = required_element.data
-                print(previous_x)
-                print(previous_y)
-                print(r_g_b)
+        previous_x = None
+        previous_y = None
+        r_g_b = None
+        if mouse_clicked and undo_button_rect.collidepoint(mouse_x, mouse_y):
+            print("running")
+            if first_node_check:
+                if current.data is not None:
+                    previous_x, previous_y, r_g_b = current.data
+                    first_node_check = False
+                    current = current.next
+            else:
+                if current.data is not None:
+                    previous_x, previous_y, r_g_b = current.data
+                    current = current.next
+            if previous_y is not None:
                 grid[previous_y][previous_x] = r_g_b
-                linked_list.delete()
+
+            mouse_clicked = False
                 
 
         # coloring the grid after changes
