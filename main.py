@@ -76,6 +76,9 @@ clock = pygame.time.Clock()
 undo_button = pygame.image.load("Undo_Button.png").convert_alpha()
 undo_button = pygame.transform.scale(undo_button, (56,56))
 
+redo_button = pygame.image.load("Redo_Button.png").convert_alpha()
+undo_button = pygame.transform.scale(redo_button, (10, 56))
+
 side_length_of_grids = None
 start = True
 
@@ -155,7 +158,9 @@ while running:
         magenta.draw(window)
         cyan.draw(window) 
         window.blit(undo_button, (692,48))
+        window.blit(redo_button, (790,48))
         undo_button_rect = undo_button.get_rect(x=692, y=48)
+        redo_button_rect = redo_button.get_rect(x=790,y=48)
         pixels_side_length = 640 // side_length_of_grids
         stopping_point_for_iteration = pixels_side_length * side_length_of_grids
         # pixels_side_length is how many pixels per grid length AND width,
@@ -192,7 +197,7 @@ while running:
                 grid.append(grid_row)
             grid_formalized = True
         has_run = False
-        if 0 <= mouse_x < 640 and 0 <= mouse_y < 640:
+        if 0 <= mouse_x < 640 and 0 <= mouse_y < 640 and mouse_clicked:
             color_list = [red.color, black.color, white.color, green.color, blue.color, yellow.color, magenta.color, cyan.color]
             for number in range(len(color_list)):
                 if current_color == color_list[number]:
@@ -201,7 +206,7 @@ while running:
                         grid_mouse_y = mouse_y // pixels_side_length
                         #iterating for undo button
                         if not has_run:
-                            linked_list.append((grid_mouse_x, grid_mouse_y, grid[grid_mouse_y][grid_mouse_x]))
+                            linked_list.append((grid_mouse_x, grid_mouse_y, grid[grid_mouse_y][grid_mouse_x], current_color))
                             current = linked_list.head
                             has_run = True
 
@@ -236,22 +241,28 @@ while running:
 
         previous_x = None
         previous_y = None
-        r_g_b = None
+        r_g_b_before = None
+        r_g_b_after = None
         if mouse_clicked and undo_button_rect.collidepoint(mouse_x, mouse_y):
-            print("running")
-            if first_node_check:
-                if current.data is not None:
-                    previous_x, previous_y, r_g_b = current.data
-                    first_node_check = False
-                    current = current.next
-            else:
-                if current.data is not None:
-                    previous_x, previous_y, r_g_b = current.data
-                    current = current.next
-            if previous_y is not None:
-                grid[previous_y][previous_x] = r_g_b
-
+            if current is not None:
+                previous_x, previous_y, r_g_b_before, r_g_b_after = current.data
+                grid[previous_y][previous_x] = r_g_b_before
+                current = current.next
             mouse_clicked = False
+        previous_x = None
+        previous_y = None
+        r_g_b_before = None
+        r_g_b_after = None
+        if mouse_clicked and redo_button_rect.collidepoint(mouse_x, mouse_y):
+            if current.data is not None:
+                previous_x, previous_y, r_g_b_before, r_g_b_after = current.data
+                grid[previous_y][previous_x] = r_g_b_after
+                if current.previous is not None:
+                    current = current.previous
+            mouse_clicked = False
+
+
+
                 
 
         # coloring the grid after changes
@@ -262,5 +273,5 @@ while running:
     manager.update(time_delta)
     manager.draw_ui(window)
     pygame.display.flip()
-
+linked_list.display()
 pygame.quit()
